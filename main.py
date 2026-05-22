@@ -1,3 +1,5 @@
+import sys
+
 from analyzer.parser import parse_line
 
 from analyzer.stats import (
@@ -10,32 +12,58 @@ from analyzer.stats import (
 
 def main():
 
+    # Check CLI argument
+    if len(sys.argv) < 2:
+
+        print(
+            "Usage: python main.py <log_file>"
+        )
+
+        return
+
+    log_file = sys.argv[1]
+
     entries = []
 
     parsed_count = 0
     malformed_count = 0
 
-    with open(
-        "sample_logs/generated_logs.log",
-        "r",
-    ) as file:
+    try:
 
-        for line in file:
+        with open(
+            log_file,
+            "r",
+            encoding="utf-8",
+        ) as file:
 
-            entry = parse_line(line)
+            for line in file:
 
-            entries.append(entry)
+                entry = parse_line(line)
 
-            if entry.malformed:
-                malformed_count += 1
-            else:
-                parsed_count += 1
+                entries.append(entry)
+
+                if entry.malformed:
+                    malformed_count += 1
+                else:
+                    parsed_count += 1
+
+    except FileNotFoundError:
+
+        print(
+            f"Error: File not found -> {log_file}"
+        )
+
+        return
 
     print("\n===== LOG ANALYSIS =====")
 
-    print(f"\nParsed lines: {parsed_count}")
+    print(
+        f"\nParsed lines: {parsed_count}"
+    )
 
-    print(f"Malformed lines: {malformed_count}")
+    print(
+        f"Malformed lines: {malformed_count}"
+    )
 
     print(
         f"\nStatus code counts:\n"
